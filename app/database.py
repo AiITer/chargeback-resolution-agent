@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
 
 from app.config import settings
 
@@ -8,6 +9,9 @@ engine = create_engine(
     pool_pre_ping=True,
 )
 
+SessionLocal = sessionmaker(
+    bind=engine,
+)
 
 def check_database_connection() -> None:
     with engine.connect() as connection:
