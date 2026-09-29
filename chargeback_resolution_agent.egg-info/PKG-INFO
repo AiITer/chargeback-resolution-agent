@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: chargeback-resolution-agent
+Version: 0.1.0
+Summary: An event-driven AI agent for merchant chargeback resolution.
+Requires-Python: <3.13,>=3.12
+Requires-Dist: fastapi
+Requires-Dist: uvicorn[standard]
+Requires-Dist: sqlalchemy>=2.0
+Requires-Dist: psycopg[binary]>=3.2
+Requires-Dist: pydantic-settings>=2.0
+Requires-Dist: alembic>=1.14
