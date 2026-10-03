@@ -2,7 +2,10 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.repositories.case import get_case_by_id
+from app.repositories.case import (
+    get_case_by_id,
+    get_case_by_stripe_dispute_id,
+)
 
 app = FastAPI(
     title="Chargeback Resolution Agent",
@@ -20,6 +23,24 @@ def get_case(
     session: Session = Depends(get_db),
 ):
     case = get_case_by_id(session, case_id)
+
+    if case is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Case not found",
+        )
+
+    return case
+
+@app.get("/cases/stripe/{stripe_dispute_id}")
+def get_case_by_stripe(
+    stripe_dispute_id: str,
+    session: Session = Depends(get_db),
+):
+    case = get_case_by_stripe_dispute_id(
+        session,
+        stripe_dispute_id,
+    )
 
     if case is None:
         raise HTTPException(
