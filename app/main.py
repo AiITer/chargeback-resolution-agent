@@ -5,7 +5,11 @@ from app.database import get_db
 from app.repositories.case import (
     get_case_by_id,
     get_case_by_stripe_dispute_id,
+    add_case,
 )
+
+from app.models.case import ChargebackCaseModel
+from app.schemas.case import ChargebackCaseCreate
 
 app = FastAPI(
     title="Chargeback Resolution Agent",
@@ -47,5 +51,20 @@ def get_case_by_stripe(
             status_code=404,
             detail="Case not found",
         )
+
+    return case
+
+@app.post("/cases")
+def create_case(
+    payload: ChargebackCaseCreate,
+    session: Session = Depends(get_db),
+):
+    case = ChargebackCaseModel(
+        **payload.model_dump()
+    )
+
+    add_case(session, case)
+    session.commit()
+    session.refresh(case)
 
     return case

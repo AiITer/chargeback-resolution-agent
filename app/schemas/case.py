@@ -14,6 +14,18 @@ class CaseStatus(StrEnum):
     LOST = "lost"
     CLOSED = "closed"
 
+class ChargebackCaseCreate(BaseModel):
+    case_id: str
+    stripe_dispute_id: str
+    dispute_reason: str
+
+    amount: int = Field(ge=0)
+
+    currency: str = Field(
+        min_length=3,
+        max_length=3,
+    )
+
 
 class ChargebackCase(BaseModel):
     case_id: str
