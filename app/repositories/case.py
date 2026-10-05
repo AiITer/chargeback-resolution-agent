@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.case import ChargebackCaseModel
+from app.schemas.case import CaseStatus
 
 
 def add_case(
@@ -35,3 +36,12 @@ def get_case_by_stripe_dispute_id(
     )
 
     return session.scalar(statement)
+
+def update_case_status(
+    session: Session,
+    case: ChargebackCaseModel,
+    status: CaseStatus,
+) -> ChargebackCaseModel:
+    case.status = status
+    session.add(case)
+    return case

@@ -26,6 +26,9 @@ class ChargebackCaseCreate(BaseModel):
         max_length=3,
     )
 
+class CaseStatusUpdate(BaseModel):
+    status: CaseStatus
+
 
 class ChargebackCase(BaseModel):
     case_id: str

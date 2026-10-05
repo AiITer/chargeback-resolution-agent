@@ -3,13 +3,17 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.repositories.case import (
+    add_case,
     get_case_by_id,
     get_case_by_stripe_dispute_id,
-    add_case,
+    update_case_status,
 )
 
 from app.models.case import ChargebackCaseModel
-from app.schemas.case import ChargebackCaseCreate
+from app.schemas.case import (
+    ChargebackCaseCreate,
+    CaseStatusUpdate,
+)
 
 app = FastAPI(
     title="Chargeback Resolution Agent",
@@ -64,6 +68,31 @@ def create_case(
     )
 
     add_case(session, case)
+    session.commit()
+    session.refresh(case)
+
+    return case
+
+@app.patch("/cases/{case_id}/status")
+def patch_case_status(
+    case_id: str,
+    payload: CaseStatusUpdate,
+    session: Session = Depends(get_db),
+):
+    case = get_case_by_id(session, case_id)
+
+    if case is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Case not found",
+        )
+
+    update_case_status(
+        session,
+        case,
+        payload.status,
+    )
+
     session.commit()
     session.refresh(case)
 
