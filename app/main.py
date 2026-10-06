@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.database import get_db
 from app.repositories.case import (
@@ -68,9 +69,19 @@ def create_case(
     )
 
     add_case(session, case)
-    session.commit()
-    session.refresh(case)
+    
+    try:
+        session.commit()
 
+    except IntegrityError:
+        session.rollback()
+
+        raise HTTPException(
+            status_code=409,
+            detail="Case already exists",
+        )
+
+    session.refresh(case)
     return case
 
 @app.patch("/cases/{case_id}/status")
