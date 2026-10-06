@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class CaseStatus(StrEnum):
@@ -31,6 +31,8 @@ class CaseStatusUpdate(BaseModel):
 
 
 class ChargebackCase(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     case_id: str
     stripe_dispute_id: str
     dispute_reason: str

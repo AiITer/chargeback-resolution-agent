@@ -12,6 +12,7 @@ from app.repositories.case import (
 
 from app.models.case import ChargebackCaseModel
 from app.schemas.case import (
+    ChargebackCase,
     ChargebackCaseCreate,
     CaseStatusUpdate,
 )
@@ -26,7 +27,7 @@ app = FastAPI(
 def health_check():
     return {"status": "ok"}
 
-@app.get("/cases/{case_id}")
+@app.get("/cases/{case_id}", response_model=ChargebackCase)
 def get_case(
     case_id: str,
     session: Session = Depends(get_db),
@@ -41,7 +42,10 @@ def get_case(
 
     return case
 
-@app.get("/cases/stripe/{stripe_dispute_id}")
+@app.get(
+    "/cases/stripe/{stripe_dispute_id}",
+    response_model=ChargebackCase,
+)
 def get_case_by_stripe(
     stripe_dispute_id: str,
     session: Session = Depends(get_db),
@@ -59,7 +63,7 @@ def get_case_by_stripe(
 
     return case
 
-@app.post("/cases")
+@app.post("/cases", response_model=ChargebackCase)
 def create_case(
     payload: ChargebackCaseCreate,
     session: Session = Depends(get_db),
@@ -84,7 +88,10 @@ def create_case(
     session.refresh(case)
     return case
 
-@app.patch("/cases/{case_id}/status")
+@app.patch(
+    "/cases/{case_id}/status",
+    response_model=ChargebackCase,
+)
 def patch_case_status(
     case_id: str,
     payload: CaseStatusUpdate,
