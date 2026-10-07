@@ -1,6 +1,7 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from uuid import uuid4
 
 from app.database import get_db
 from app.repositories.case import (
@@ -63,12 +64,17 @@ def get_case_by_stripe(
 
     return case
 
-@app.post("/cases", response_model=ChargebackCase)
+@app.post(
+    "/cases",
+    response_model=ChargebackCase,
+    status_code=201,
+)
 def create_case(
     payload: ChargebackCaseCreate,
     session: Session = Depends(get_db),
 ):
     case = ChargebackCaseModel(
+        case_id=str(uuid4()),
         **payload.model_dump()
     )
 

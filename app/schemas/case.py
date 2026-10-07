@@ -15,7 +15,6 @@ class CaseStatus(StrEnum):
     CLOSED = "closed"
 
 class ChargebackCaseCreate(BaseModel):
-    case_id: str
     stripe_dispute_id: str
     dispute_reason: str
 
