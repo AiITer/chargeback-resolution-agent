@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from uuid import uuid4
@@ -17,6 +17,8 @@ from app.schemas.case import (
     ChargebackCaseCreate,
     CaseStatusUpdate,
 )
+
+from app.integrations.stripe import construct_stripe_event
 
 app = FastAPI(
     title="Chargeback Resolution Agent",
@@ -121,3 +123,47 @@ def patch_case_status(
     session.refresh(case)
 
     return case
+
+@app.post("/webhooks/stripe")
+async def stripe_webhook(
+    request: Request,
+    session: Session = Depends(get_db),
+):
+    payload = await request.body()
+    signature = request.headers.get("stripe-signature")
+
+    try:
+        event = construct_stripe_event(
+            payload,
+            signature,
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid Stripe webhook signature",
+        )
+
+    if event["type"] == "charge.dispute.created":
+        dispute = event["data"]["object"]
+
+        case = get_case_by_stripe_dispute_id(
+            session,
+            dispute["id"],
+        )
+
+        if case is None:
+            case = ChargebackCaseModel(
+                case_id=str(uuid4()),
+                stripe_dispute_id=dispute["id"],
+                dispute_reason=dispute["reason"],
+                amount=dispute["amount"],
+                currency=dispute["currency"],
+            )
+
+            add_case(session, case)
+            session.commit()
+            session.refresh(case)
+
+            print("Created case:", case.case_id)
+            
+    return {"received": True}

@@ -1,4 +1,4 @@
-from stripe import StripeClient
+from stripe import StripeClient, Webhook
 
 from app.config import settings
 
@@ -12,3 +12,18 @@ def get_stripe_client() -> StripeClient:
 def get_stripe_balance():
     client = get_stripe_client()
     return client.v1.balance.retrieve()
+
+def construct_stripe_event(
+    payload: bytes,
+    signature: str | None,
+):
+    if settings.stripe_webhook_secret is None:
+        raise RuntimeError(
+            "Stripe webhook secret is not configured."
+        )
+
+    return Webhook.construct_event(
+        payload=payload,
+        sig_header=signature,
+        secret=settings.stripe_webhook_secret,
+    )

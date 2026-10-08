@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     postgres_port: int = 5432
 
     stripe_secret_key: str | None = None
+    stripe_webhook_secret: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",
