@@ -6,6 +6,8 @@ app/main.py
 app/models/__init__.py
 app/models/base.py
 app/models/case.py
+app/repositories/__init__.py
+app/repositories/case.py
 app/schemas/__init__.py
 app/schemas/case.py
 chargeback_resolution_agent.egg-info/PKG-INFO

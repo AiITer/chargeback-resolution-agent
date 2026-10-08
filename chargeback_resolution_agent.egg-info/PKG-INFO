@@ -9,3 +9,4 @@ Requires-Dist: sqlalchemy>=2.0
 Requires-Dist: psycopg[binary]>=3.2
 Requires-Dist: pydantic-settings>=2.0
 Requires-Dist: alembic>=1.14
+Requires-Dist: stripe<17.0,>=16.0
