@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from uuid import uuid4
+import logging
 
 from app.database import get_db
 from app.repositories.case import (
@@ -19,6 +20,8 @@ from app.schemas.case import (
 )
 
 from app.integrations.stripe import construct_stripe_event
+
+logger = logging.getLogger("uvicorn.error")
 
 app = FastAPI(
     title="Chargeback Resolution Agent",
@@ -164,6 +167,10 @@ async def stripe_webhook(
             session.commit()
             session.refresh(case)
 
-            print("Created case:", case.case_id)
+            logger.info(
+                "Created chargeback case %s from Stripe dispute %s",
+                case.case_id,
+                dispute["id"],
+            )
             
     return {"received": True}
