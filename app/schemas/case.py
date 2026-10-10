@@ -14,19 +14,21 @@ class CaseStatus(StrEnum):
     LOST = "lost"
     CLOSED = "closed"
 
-class ChargebackCaseCreate(BaseModel):
-    stripe_dispute_id: str
-    dispute_reason: str
+# DEV/ADMIN ONLY — not part of the production Agent workflow.
+# class ChargebackCaseCreate(BaseModel):
+#     stripe_dispute_id: str
+#     dispute_reason: str
 
-    amount: int = Field(ge=0)
+#     amount: int = Field(ge=0)
 
-    currency: str = Field(
-        min_length=3,
-        max_length=3,
-    )
+#     currency: str = Field(
+#         min_length=3,
+#         max_length=3,
+#     )
 
-class CaseStatusUpdate(BaseModel):
-    status: CaseStatus
+# DEV/ADMIN ONLY — kept for manual workflow-state debugging.
+# class CaseStatusUpdate(BaseModel):
+#     status: CaseStatus
 
 
 class ChargebackCase(BaseModel):
@@ -34,6 +36,10 @@ class ChargebackCase(BaseModel):
     
     case_id: str
     stripe_dispute_id: str
+
+    stripe_charge_id: str | None = None
+    stripe_payment_intent_id: str | None = None
+
     dispute_reason: str
 
     amount: int = Field(
@@ -46,8 +52,16 @@ class ChargebackCase(BaseModel):
         max_length=3,
     )
 
+    stripe_dispute_status: str | None = None
+    network_reason_code: str | None = None
+    evidence_due_by: datetime | None = None
+    stripe_dispute_created_at: datetime | None = None
+
     status: CaseStatus = CaseStatus.OPEN
 
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
+
+    
+    

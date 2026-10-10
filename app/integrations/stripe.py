@@ -27,3 +27,7 @@ def construct_stripe_event(
         sig_header=signature,
         secret=settings.stripe_webhook_secret,
     )
+
+def get_stripe_dispute(dispute_id: str):
+    client = get_stripe_client()
+    return client.v1.disputes.retrieve(dispute_id)

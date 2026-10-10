@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from uuid import uuid4
 import logging
+from datetime import datetime, timezone
 
 from app.database import get_db
 from app.repositories.case import (
@@ -15,8 +16,8 @@ from app.repositories.case import (
 from app.models.case import ChargebackCaseModel
 from app.schemas.case import (
     ChargebackCase,
-    ChargebackCaseCreate,
-    CaseStatusUpdate,
+    # ChargebackCaseCreate,
+    # CaseStatusUpdate,
 )
 
 from app.integrations.stripe import construct_stripe_event
@@ -69,63 +70,64 @@ def get_case_by_stripe(
 
     return case
 
-@app.post(
-    "/cases",
-    response_model=ChargebackCase,
-    status_code=201,
-)
-def create_case(
-    payload: ChargebackCaseCreate,
-    session: Session = Depends(get_db),
-):
-    case = ChargebackCaseModel(
-        case_id=str(uuid4()),
-        **payload.model_dump()
-    )
+# DEV/ADMIN ONLY — not part of the production Agent workflow.
+# @app.post(
+#     "/cases",
+#     response_model=ChargebackCase,
+#     status_code=201,
+# )
+# def create_case(
+#     payload: ChargebackCaseCreate,
+#     session: Session = Depends(get_db),
+# ):
+#     case = ChargebackCaseModel(
+#         case_id=str(uuid4()),
+#         **payload.model_dump()
+#     )
 
-    add_case(session, case)
+#     add_case(session, case)
     
-    try:
-        session.commit()
+#     try:
+#         session.commit()
 
-    except IntegrityError:
-        session.rollback()
+#     except IntegrityError:
+#         session.rollback()
 
-        raise HTTPException(
-            status_code=409,
-            detail="Case already exists",
-        )
+#         raise HTTPException(
+#             status_code=409,
+#             detail="Case already exists",
+#         )
 
-    session.refresh(case)
-    return case
+#     session.refresh(case)
+#     return case
 
-@app.patch(
-    "/cases/{case_id}/status",
-    response_model=ChargebackCase,
-)
-def patch_case_status(
-    case_id: str,
-    payload: CaseStatusUpdate,
-    session: Session = Depends(get_db),
-):
-    case = get_case_by_id(session, case_id)
+# @app.patch(
+#     "/cases/{case_id}/status",
+#     response_model=ChargebackCase,
+# )
+# def patch_case_status(
+#     case_id: str,
+#     payload: CaseStatusUpdate,
+#     session: Session = Depends(get_db),
+# ):
+#     case = get_case_by_id(session, case_id)
 
-    if case is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Case not found",
-        )
+#     if case is None:
+#         raise HTTPException(
+#             status_code=404,
+#             detail="Case not found",
+#         )
 
-    update_case_status(
-        session,
-        case,
-        payload.status,
-    )
+#     update_case_status(
+#         session,
+#         case,
+#         payload.status,
+#     )
 
-    session.commit()
-    session.refresh(case)
+#     session.commit()
+#     session.refresh(case)
 
-    return case
+#     return case
 
 @app.post("/webhooks/stripe")
 async def stripe_webhook(
@@ -147,7 +149,7 @@ async def stripe_webhook(
         )
 
     if event["type"] == "charge.dispute.created":
-        dispute = event["data"]["object"]
+        dispute = event["data"]["object"].to_dict()
 
         case = get_case_by_stripe_dispute_id(
             session,
@@ -155,12 +157,46 @@ async def stripe_webhook(
         )
 
         if case is None:
+            payment_method_details = (
+                dispute.get("payment_method_details") or {}
+            )
+
+            card_details = (
+                payment_method_details.get("card") or {}
+            )
+
+            evidence_details = (
+                dispute.get("evidence_details") or {}
+            )
+
+            due_by = evidence_details.get("due_by")
+            stripe_created = dispute.get("created")
             case = ChargebackCaseModel(
                 case_id=str(uuid4()),
                 stripe_dispute_id=dispute["id"],
+                stripe_charge_id=dispute.get("charge"),
+                stripe_payment_intent_id=dispute.get("payment_intent"),
                 dispute_reason=dispute["reason"],
                 amount=dispute["amount"],
                 currency=dispute["currency"],
+                stripe_dispute_status=dispute.get("status"),
+                network_reason_code=card_details.get("network_reason_code"),
+                evidence_due_by=(
+                    datetime.fromtimestamp(
+                        due_by,
+                        tz=timezone.utc,
+                    )
+                    if due_by is not None
+                    else None
+                ),
+                stripe_dispute_created_at=(
+                    datetime.fromtimestamp(
+                        stripe_created,
+                        tz=timezone.utc,
+                    )
+                    if stripe_created is not None
+                    else None
+                ),
             )
 
             add_case(session, case)
