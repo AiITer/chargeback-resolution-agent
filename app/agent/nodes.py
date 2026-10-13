@@ -14,4 +14,12 @@ def load_case_context(state: ChargebackAgentState) -> dict:
 
         return {
             "stripe_dispute_id": case.stripe_dispute_id,
+            "stripe_charge_id": case.stripe_charge_id,
+            "stripe_payment_intent_id": case.stripe_payment_intent_id,
+            "dispute_reason": case.dispute_reason,
+            "amount": case.amount,
+            "currency": case.currency,
+            "stripe_dispute_status": case.stripe_dispute_status,
+            "network_reason_code": case.network_reason_code,
+            "evidence_due_by": case.evidence_due_by,
         }

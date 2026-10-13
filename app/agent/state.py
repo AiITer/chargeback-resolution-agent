@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import TypedDict
 
+from app.agent.schemas import TriageResult
+
 
 class ChargebackAgentState(TypedDict, total=False):
     case_id: str
@@ -16,3 +18,5 @@ class ChargebackAgentState(TypedDict, total=False):
     stripe_dispute_status: str | None
     network_reason_code: str | None
     evidence_due_by: datetime | None
+
+    triage_result: TriageResult

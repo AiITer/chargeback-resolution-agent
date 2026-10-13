@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     stripe_secret_key: str | None = None
     stripe_webhook_secret: str | None = None
 
+    openai_api_key: str | None = None
+    openai_model: str = "gpt-5.6-luna"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
