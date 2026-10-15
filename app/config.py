@@ -13,6 +13,8 @@ class Settings(BaseSettings):
 
     openai_api_key: str | None = None
     openai_model: str = "gpt-5.6-luna"
+    openai_embedding_model: str = "text-embedding-3-small"
+    openai_embedding_dimensions: int = 1536
 
     max_active_workflows: int = 20
     emergency_reserved_slots: int = 4
