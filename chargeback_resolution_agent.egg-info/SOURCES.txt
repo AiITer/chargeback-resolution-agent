@@ -3,6 +3,11 @@ pyproject.toml
 app/config.py
 app/database.py
 app/main.py
+app/agent/__init__.py
+app/agent/nodes.py
+app/agent/prompts.py
+app/agent/schemas.py
+app/agent/state.py
 app/integrations/__init__.py
 app/integrations/stripe.py
 app/models/__init__.py

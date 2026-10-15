@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TypedDict
 
-from app.agent.schemas import TriageResult
+from app.agent.schemas import CaseAssessment
 
 
 class ChargebackAgentState(TypedDict, total=False):
@@ -19,4 +19,4 @@ class ChargebackAgentState(TypedDict, total=False):
     network_reason_code: str | None
     evidence_due_by: datetime | None
 
-    triage_result: TriageResult
+    case_assessment: CaseAssessment
