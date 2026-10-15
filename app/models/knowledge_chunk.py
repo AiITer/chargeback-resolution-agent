@@ -30,6 +30,6 @@ class KnowledgeChunkModel(Base):
     )
 
     embedding: Mapped[list[float]] = mapped_column(
-        VECTOR(1536),
+        VECTOR(384),
         nullable=False,
     )

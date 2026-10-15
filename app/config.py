@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-5.6-luna"
     openai_embedding_model: str = "text-embedding-3-small"
     openai_embedding_dimensions: int = 1536
+    
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
+    embedding_dimensions: int = 384
 
     max_active_workflows: int = 20
     emergency_reserved_slots: int = 4
