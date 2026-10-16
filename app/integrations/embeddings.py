@@ -22,3 +22,30 @@ def create_embedding(text: str) -> list[float]:
     )
 
     return embedding.tolist()
+
+def create_embeddings(texts: list[str]) -> list[list[float]]:
+    if not texts:
+        return []
+
+    if any(not text.strip() for text in texts):
+        raise ValueError("Embedding texts cannot contain empty text")
+
+    model = get_embedding_model()
+
+    embeddings = model.encode(
+        texts,
+        normalize_embeddings=True,
+    )
+
+    return embeddings.tolist()
+
+def count_embedding_tokens(text: str) -> int:
+    model = get_embedding_model()
+
+    token_ids = model.tokenizer(
+        text,
+        add_special_tokens=True,
+        truncation=False,
+    )["input_ids"]
+
+    return len(token_ids)
