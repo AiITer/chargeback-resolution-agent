@@ -49,3 +49,16 @@ def count_embedding_tokens(text: str) -> int:
     )["input_ids"]
 
     return len(token_ids)
+
+BGE_QUERY_INSTRUCTION = (
+    "Represent this sentence for searching relevant passages: "
+)
+
+
+def create_query_embedding(query: str) -> list[float]:
+    if not query.strip():
+        raise ValueError("Embedding query cannot be empty")
+
+    return create_embedding(
+        BGE_QUERY_INSTRUCTION + query.strip()
+    )

@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     embedding_dimensions: int = 384
+    knowledge_retrieval_top_k: int = 5
 
     max_active_workflows: int = 20
     emergency_reserved_slots: int = 4

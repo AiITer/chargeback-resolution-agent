@@ -1,5 +1,10 @@
 from pathlib import Path
 import re
+from sqlalchemy import delete
+
+from app.database import SessionLocal, check_database_connection
+from app.integrations.embeddings import create_embeddings
+from app.models.knowledge_chunk import KnowledgeChunkModel
 
 
 def load_markdown_document(path: Path) -> str:
@@ -42,3 +47,38 @@ def build_embedding_texts(
         f"{heading}\n\n{content}"
         for heading, content in sections
     ]
+
+def ingest_markdown_document(path: Path, source: str) -> int:
+    check_database_connection()
+    
+    text = load_markdown_document(path)
+    sections = split_markdown_sections(text)
+    embedding_texts = build_embedding_texts(sections)
+    embeddings = create_embeddings(embedding_texts)
+
+    if len(sections) != len(embeddings):
+        raise ValueError(
+            "Section and embedding counts do not match"
+        )
+
+    with SessionLocal() as session:
+        session.execute(
+            delete(KnowledgeChunkModel).where(
+                KnowledgeChunkModel.source == source
+            )
+        )
+
+        chunks = [
+            KnowledgeChunkModel(
+                source=source,
+                section=heading,
+                content=content,
+                embedding=embedding,
+            )
+            for (heading, content), embedding in zip(sections, embeddings)
+        ]
+
+        session.add_all(chunks)
+        session.commit()
+
+    return len(chunks)
