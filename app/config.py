@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     max_active_workflows: int = 20
     emergency_reserved_slots: int = 4
 
+    llm_provider: str = "ollama"
+    ollama_model: str = "llama3.2:3b"
+    ollama_base_url: str = "http://localhost:11434"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

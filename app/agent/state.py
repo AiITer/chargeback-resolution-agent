@@ -1,5 +1,8 @@
 from datetime import datetime
-from typing import TypedDict
+from typing import Annotated, TypedDict
+
+from langchain_core.messages import AnyMessage
+from langgraph.graph.message import add_messages
 
 from app.agent.schemas import CaseAssessment
 
@@ -18,5 +21,7 @@ class ChargebackAgentState(TypedDict, total=False):
     stripe_dispute_status: str | None
     network_reason_code: str | None
     evidence_due_by: datetime | None
+
+    messages: Annotated[list[AnyMessage], add_messages]
 
     case_assessment: CaseAssessment
