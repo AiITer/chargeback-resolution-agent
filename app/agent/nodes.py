@@ -7,6 +7,8 @@ from app.database import SessionLocal
 from app.integrations.llm import get_chat_model
 from app.repositories.case import get_case_by_id
 
+from datetime import datetime, timezone
+
 
 TOOLS = [
     search_company_knowledge,
@@ -39,6 +41,7 @@ def load_case_context(state: ChargebackAgentState) -> dict:
 
 def investigate(state: ChargebackAgentState) -> dict:
     messages = state.get("messages", [])
+    current_time = datetime.now(timezone.utc)
 
     if not messages:
         initial_messages = [
@@ -48,6 +51,7 @@ def investigate(state: ChargebackAgentState) -> dict:
             HumanMessage(
                 content=(
                     "Investigate this formal dispute.\n\n"
+                    f"Current time: {current_time.isoformat()}\n"
                     f"Stripe dispute ID: {state['stripe_dispute_id']}\n"
                     f"Stripe charge ID: {state.get('stripe_charge_id')}\n"
                     f"Payment intent ID: {state.get('stripe_payment_intent_id')}\n"
