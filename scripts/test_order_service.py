@@ -7,6 +7,7 @@ def main() -> None:
     print("ORDER ID:", order.order_id)
     print("STATUS:", order.status)
     print("FULFILLMENT:", order.fulfillment_status)
+    print(order.shipping_carrier)
     print("TRACKING:", order.tracking_number)
     print("REFUND STATUS:", order.refund_status)
     print("REFUNDED AT:", order.refunded_at)

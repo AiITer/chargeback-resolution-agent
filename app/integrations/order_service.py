@@ -13,6 +13,7 @@ class OrderRecord(BaseModel):
     created_at: datetime
 
     fulfillment_status: str
+    shipping_carrier: str | None
     tracking_number: str | None
 
     refund_status: str

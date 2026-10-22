@@ -14,6 +14,7 @@ class Order(BaseModel):
     created_at: datetime
 
     fulfillment_status: str
+    shipping_carrier: str | None
     tracking_number: str | None
 
     refund_status: str
@@ -30,7 +31,8 @@ ORDERS = {
         status="completed",
         created_at=datetime(2026, 10, 10, 14, 30, tzinfo=timezone.utc),
         fulfillment_status="shipped",
-        tracking_number="TEST-TRACK-1001",
+        shipping_carrier="shippo",
+        tracking_number="SHIPPO_DELIVERED",
         refund_status="not_refunded",
         refund_amount=0,
         refunded_at=None,
