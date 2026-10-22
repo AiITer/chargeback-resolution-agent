@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     stripe_secret_key: str | None = None
     stripe_webhook_secret: str | None = None
 
+    order_service_base_url: str = "http://127.0.0.1:8001"
+
     openai_api_key: str | None = None
     openai_model: str = "gpt-5.6-luna"
     openai_embedding_model: str = "text-embedding-3-small"

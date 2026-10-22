@@ -26,6 +26,7 @@ dependencies = [
     "ollama-haystack",
     "sentence-transformers-haystack",
     "langchain-google-genai>=4.0,<5.0",
+    "httpx>=0.28,<1.0",
 ]
 
 [tool.setuptools.packages.find]

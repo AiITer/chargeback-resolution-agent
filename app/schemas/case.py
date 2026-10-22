@@ -39,6 +39,7 @@ class ChargebackCase(BaseModel):
 
     stripe_charge_id: str | None = None
     stripe_payment_intent_id: str | None = None
+    order_id: str | None = None
 
     dispute_reason: str
 

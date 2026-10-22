@@ -9,6 +9,7 @@ from app.agent.schemas import CaseAssessment
 
 class ChargebackAgentState(TypedDict, total=False):
     case_id: str
+    order_id: str | None
 
     stripe_dispute_id: str
     stripe_charge_id: str | None

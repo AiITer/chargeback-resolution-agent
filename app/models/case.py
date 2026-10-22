@@ -15,6 +15,12 @@ class ChargebackCaseModel(Base):
         primary_key=True,
     )
 
+    order_id: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+        index=True,
+    )
+
     stripe_dispute_id: Mapped[str] = mapped_column(
         String(255),
         unique=True,
