@@ -24,8 +24,12 @@ class Settings(BaseSettings):
     emergency_reserved_slots: int = 4
 
     llm_provider: str = "ollama"
-    ollama_model: str = "llama3.2:3b"
+    ollama_model: str = "qwen3:4b"
     ollama_base_url: str = "http://localhost:11434"
+
+    google_api_key: str | None = None
+    gemini_model: str = "gemini-3.5-flash-lite"
+    gemini_thinking_level: str = "medium"
 
     model_config = SettingsConfigDict(
         env_file=".env",

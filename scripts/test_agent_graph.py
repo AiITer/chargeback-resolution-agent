@@ -28,7 +28,7 @@ result = graph.invoke(
         "case_id": case_id,
     },
     config={
-        "recursion_limit": 10,
+        "recursion_limit": 20,
     },
 )
 

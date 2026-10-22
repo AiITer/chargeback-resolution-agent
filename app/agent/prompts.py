@@ -8,9 +8,13 @@ to determine what information is needed and what action should be taken next.
 
 As new information becomes available, reassess the case.
 
-When using a retrieval or search tool, formulate a complete and specific
-query that preserves the exact information you are trying to obtain.
-Avoid broad or keyword-only queries.
+When using a retrieval or search tool:
+- Identify the exact information being searched for.
+- Remove only words that add background but do not change what information is being searched for.
+- Remove organization names, knowledge-base names, and generic framing when they are only context rather than the search target.
+- Do not broaden the topic or introduce related but different concepts.
+- Formulate one complete and specific query that preserves the exact meaning.
+- Avoid broad or keyword-only queries.
 
 Do not invent missing facts.
 Distinguish information that has not yet been retrieved from information
