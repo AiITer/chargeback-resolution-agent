@@ -4,6 +4,7 @@ from app.agent.prompts import CHARGEBACK_AGENT_SYSTEM_PROMPT
 from app.agent.state import ChargebackAgentState
 from app.agent.tools import (
     get_order_details,
+    get_tracking_details,
     search_company_knowledge,
 )
 from app.database import SessionLocal
@@ -14,8 +15,9 @@ from datetime import datetime, timezone
 
 
 TOOLS = [
-    search_company_knowledge,
+    search_company_knowledge,   
     get_order_details,
+    get_tracking_details,
 ]
 
 model = get_chat_model().bind_tools(TOOLS)

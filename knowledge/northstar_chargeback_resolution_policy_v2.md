@@ -1,11 +1,16 @@
 # Northstar Commerce Inc.
+
 ## Chargeback Resolution and Dispute Authority Policy
 
-**Policy ID:** NCR-CB-001  
-**Version:** 2.0  
-**Effective Date:** 2026-10-16  
-**Owner:** Payments & Risk Operations  
-**Applies To:** Chargeback Operations, Payment Operations, Risk Operations, Customer Support, and authorized automated agents
+**Policy ID:** NCR-CB-001
+
+**Version:** 2.0
+
+**Effective Date:** 2026-10-16
+
+**Owner:** Payments & Risk Operations
+
+**Applies To:** Chargeback Operations, Payment Operations, Risk Operations, Customer Support, and authorized automated agents used in formal dispute handling
 
 ---
 
@@ -24,9 +29,9 @@ The objective is not to contest every dispute. The objective is to reach a comme
 - operational risk; and
 - applicable Stripe, card-network, and Northstar requirements.
 
-Authorized automated agents may perform work under this policy. They are expected to reason over the facts of each case, consult relevant company and external guidance, and document the basis for material decisions.
+Activities governed by this policy may be performed by authorized personnel or approved automated agents, subject to the same substantive requirements and to applicable authority, control, audit, and review requirements.
 
-This policy should not be interpreted as a fixed decision tree where contextual judgment is required.
+This policy establishes decision principles and control requirements. It does not prescribe a fixed decision tree where case-specific judgment is required.
 
 ---
 
@@ -55,27 +60,27 @@ Live case facts must come from current operational systems or persisted case sta
 
 ## 3. Operating Principles
 
-### 3.1 Case-specific reasoning
+### 3.1 Case-Specific Assessment
 
 Each dispute must be evaluated on its own facts.
 
 A dispute reason or network reason code is an important starting point, but it does not by itself determine the appropriate outcome.
 
-The reviewer or authorized agent should continually consider:
+Each Case assessment should consider, as applicable:
 
-- What does the customer claim happened?
-- What do Northstar's records show happened?
-- What evidence supports or contradicts each account?
-- Which facts remain unknown?
-- Which missing information would most materially change the decision?
-- Is additional investigation likely to be valuable?
-- Does sufficient time remain?
-- Is accepting or contesting commercially reasonable?
-- Does the proposed action fall within delegated authority?
+- the customer's stated basis for the dispute;
+- Northstar's records of the transaction, fulfillment, refund, replacement, and related activity;
+- evidence supporting or contradicting material assertions;
+- material facts that remain unknown;
+- information gaps most likely to change the recommended resolution;
+- the expected value of further investigation;
+- the remaining response period;
+- the commercial reasonableness of accepting or contesting the dispute; and
+- whether the proposed action falls within delegated authority.
 
-### 3.2 Evidence before assertion
+### 3.2 Evidence Before Assertion
 
-No reviewer or automated agent may present an inference as a verified fact.
+No inference may be recorded, submitted, or represented as a verified fact unless supported by sufficient evidence.
 
 Case records should distinguish, where relevant:
 
@@ -86,56 +91,56 @@ Case records should distinguish, where relevant:
 - unresolved questions; and
 - contradictions between sources.
 
-### 3.3 Continuous investigation
+### 3.3 Continuous Investigation
 
 A formal dispute is handled through one continuous investigation process.
 
-The investigation should repeatedly follow this pattern:
+The investigation should repeatedly:
 
 1. assess what is currently known;
 2. identify the most valuable missing information;
-3. obtain information from an appropriate source;
-4. incorporate the new facts;
-5. reassess the case.
+3. obtain information from an appropriate authorized source;
+4. incorporate newly obtained facts; and
+5. reassess the Case.
 
-At any reassessment point, the reviewer or agent may:
+At any reassessment point, a Case may:
 
-- continue investigating;
-- recommend acceptance;
-- recommend contesting;
-- determine that sufficient evidence exists for submission preparation; or
-- escalate for human review.
+- remain under investigation;
+- proceed to a recommendation to accept;
+- proceed to a recommendation to contest;
+- be determined ready for submission preparation; or
+- be escalated for human review.
 
-A recommendation that a case is worth contesting does not necessarily end the investigation.
+A recommendation to contest does not, by itself, establish that the evidence package is complete.
 
-If the evidence package is incomplete, investigation should continue until sufficient evidence has been obtained or a stopping condition is reached.
+If the evidence package remains incomplete, investigation should continue until sufficient evidence has been obtained or a stopping condition under this policy has been reached.
 
-### 3.4 Proportional effort
+### 3.4 Proportional Effort
 
-Investigation effort should be proportional to:
+Investigation effort should be proportionate to:
 
 - disputed value;
 - urgency;
 - evidence availability;
 - complexity;
-- expected probability of improving the outcome;
+- expected probability that further work will materially improve the outcome;
 - cost of further investigation; and
 - operational risk.
 
-A low-value dispute with clear merchant responsibility should not consume the same resources as a complex or high-risk dispute where additional evidence is likely to materially affect the result.
+A low-value dispute with clear merchant responsibility should not consume the same resources as a complex or high-risk dispute in which additional evidence is reasonably likely to affect the result.
 
-### 3.5 Selective human involvement
+### 3.5 Selective Human Involvement
 
 Human review is not required for every routine action.
 
-Automation should be permitted where:
+Automated agents may perform routine actions where:
 
-- policy is sufficiently clear;
-- evidence is sufficiently strong;
+- the applicable policy is sufficiently clear;
+- the available evidence is sufficiently strong;
 - delegated authority permits the action; and
 - no exceptional risk condition applies.
 
-Human review is required when the case exceeds delegated authority, contains material ambiguity, or presents legal, privacy, regulatory, financial, customer, or reputational risk outside normal operating policy.
+Human review is required where a Case exceeds delegated authority, contains material ambiguity, or presents legal, privacy, regulatory, financial, customer, or reputational risk outside normal operating policy.
 
 ---
 
@@ -157,7 +162,7 @@ The Case record should preserve, where available:
 - dispute creation time; and
 - Northstar workflow state.
 
-Case creation is a deterministic system responsibility.
+Case creation must be performed through deterministic system controls and must not depend on discretionary assessment.
 
 ---
 
@@ -183,9 +188,9 @@ Prioritization may consider:
 
 Northstar maintains bounded active investigation capacity.
 
-Cases waiting for customers, employees, Stripe, carriers, approval, or other external events should be suspended and should not consume active reasoning capacity.
+Cases waiting for customers, employees, Stripe, carriers, approval, or other external events should be suspended and should not consume active investigation capacity.
 
-Prioritization and capacity management must remain separate from the reasoning performed inside one individual Case workflow.
+Prioritization and capacity management must remain separate from the substantive assessment of an individual Case.
 
 ---
 
@@ -193,7 +198,7 @@ Prioritization and capacity management must remain separate from the reasoning p
 
 Investigation is adaptive rather than a fixed sequence of mandatory checks.
 
-The reviewer or agent should identify the factual questions that matter for the current dispute and select the most appropriate evidence source.
+Investigation should identify the factual questions material to the current dispute and use the most appropriate authorized evidence source for each question.
 
 Evidence should not be gathered merely because it is available.
 
@@ -206,7 +211,7 @@ The investigation should focus on evidence that can:
 - determine whether accepting or contesting is commercially reasonable; or
 - complete an evidence package after a contest recommendation.
 
-The reviewer or agent should avoid redundant tool calls when the required fact is already available in durable case state.
+Evidence already available in durable Case state should not be retrieved redundantly unless re-verification is materially justified.
 
 ---
 
@@ -257,7 +262,7 @@ Shipping providers may be used to obtain or verify:
 
 A `returned_to_sender` event is relevant evidence but must not automatically determine acceptance.
 
-The reviewer or agent should also consider whether:
+Assessment of a return, failed delivery, or other shipping exception should also consider whether:
 
 - a refund was already issued;
 - a replacement was sent;
@@ -292,7 +297,7 @@ Internal policy and authoritative external guidance may be used to determine:
 
 Long-lived policies and guidance may be maintained in Northstar's approved knowledge system.
 
-Live operational facts must not be substituted with static RAG knowledge.
+Live operational facts must not be substituted with static policy or knowledge-repository content.
 
 ---
 
@@ -323,7 +328,7 @@ The customer must not be asked to provide:
 
 Email is the supported customer-contact channel for the initial system.
 
-An automated agent may draft or send routine case-related email when permitted by communication authority.
+Routine case-related email may be drafted or sent by an automated agent only where permitted by the applicable communication authority.
 
 Communication authority may be classified as:
 
@@ -354,7 +359,7 @@ A customer reply does not automatically mean that the information gap has been r
 
 ## 9. Evidence Assessment
 
-At every significant point in the investigation, the reviewer or agent should reassess whether available evidence is:
+At every significant point in the investigation, available evidence should be reassessed for whether it is:
 
 - sufficient;
 - relevant;
@@ -414,7 +419,7 @@ A recommendation and authority to execute an action are separate.
 
 Northstar uses bounded delegated autonomy.
 
-Routine actions may be executed automatically only when permitted by explicit company authority policy.
+Routine actions may be executed by an automated agent only when permitted by explicit company authority policy and applicable system controls.
 
 High-risk, exceptional, sensitive, ambiguous, or otherwise out-of-policy Cases require human involvement.
 
@@ -432,7 +437,7 @@ Authority decisions may consider:
 
 Exact monetary thresholds and approval limits are configuration and governance decisions and are not defined by this policy version.
 
-A reviewer or automated agent must not divide, reclassify, manipulate, or otherwise alter a Case to bypass an authority requirement.
+Neither personnel nor automated agents may divide, reclassify, manipulate, or otherwise alter a Case for the purpose of bypassing an authority requirement.
 
 ---
 
@@ -472,7 +477,7 @@ Before any response is submitted externally, deterministic validation should ver
 - required approval has been obtained; and
 - the dispute has not already been submitted.
 
-These safeguards must not depend solely on model judgment.
+These safeguards must be enforced independently of model judgment.
 
 ---
 
@@ -480,9 +485,9 @@ These safeguards must not depend solely on model judgment.
 
 Once an authorized evidence response has been successfully submitted to Stripe, the Case should enter a waiting state.
 
-The workflow should not continue consuming active reasoning capacity while waiting for Stripe.
+A Case waiting for Stripe should not consume active investigation capacity.
 
-Stripe webhook events or other authoritative status changes should resume the appropriate durable Case workflow.
+A Stripe webhook event or other authoritative status change should resume the applicable durable Case workflow.
 
 Submission must be protected against duplicate execution through deterministic idempotency controls.
 
@@ -498,7 +503,11 @@ Northstar must continue to follow the formal Stripe dispute lifecycle until an a
 
 A merchant refund does not automatically terminate a formal dispute.
 
-If a refund has already been issued, the reviewer or agent should assess the possibility of duplicate compensation.
+If a refund has already been issued, the Case assessment should evaluate the financial relationship between the prior refund and the amount still at issue in the formal dispute.
+
+The validity of the customer's original complaint and the appropriate resolution of the formal dispute are separate questions. A customer may have had a valid complaint while also having already received compensation from Northstar.
+
+Prior merchant compensation should be treated as material evidence when assessing the merchant's remaining liability and financial exposure, including the possibility of duplicate compensation.
 
 ---
 
@@ -533,17 +542,17 @@ Resolved disputes may be analyzed to identify:
 - operational bottlenecks; and
 - opportunities to improve policy or workflow.
 
-Historical outcomes may inform future reasoning but must not be treated as unquestionable ground truth.
+Historical outcomes may inform future assessments but must not be treated as unquestionable ground truth.
 
-Automated agents may identify or recommend potential policy improvements.
+Analysis of resolved disputes may identify or recommend potential policy improvements.
 
-They may not independently change company policy, delegated authority, or hard system controls.
+An automated agent may identify or recommend potential policy improvements, but may not independently modify company policy, delegated authority, or mandatory system controls.
 
 ---
 
 ## 18. Auditability
 
-Material automated and human actions should be attributable to a Case and recorded with sufficient context for later review.
+Material actions by personnel and automated agents should be attributable to a Case and recorded with sufficient context for later review.
 
 Records may include:
 
@@ -551,7 +560,7 @@ Records may include:
 - timestamp;
 - workflow state;
 - source consulted;
-- tool or external system used;
+- system or evidence source used;
 - relevant result;
 - model and model version for material model-based decisions;
 - Case assessment;
@@ -572,43 +581,37 @@ Logs must not contain:
 
 ---
 
-## 19. Automated-Agent Operating Boundary
+## 19. Automated Agent Governance and System Controls
 
-Northstar's Chargeback Agent is an operational decision-making system, not a fixed rule engine.
+Approved automated agents may support or perform dispute-handling activities only within the authority, data-access, audit, and control requirements established by Northstar. Automated agents are subject to the same substantive dispute-resolution, evidentiary, and recordkeeping requirements that apply to human handling of a Case.
 
-The Agent may reason about:
+Within delegated authority, automated agents may:
 
-- which evidence matters;
-- what information is missing;
-- which source should be consulted next;
-- whether customer contact is useful;
-- whether further investigation is worthwhile;
-- whether evidence is sufficient;
-- whether evidence conflicts;
-- whether accepting or contesting is appropriate;
-- whether an evidence package is ready; and
-- whether uncertainty requires escalation.
+- identify material evidence;
+- identify information gaps;
+- select an authorized source for additional evidence;
+- determine whether further investigation is warranted;
+- assess evidence sufficiency and consistency;
+- recommend acceptance, contest, continued investigation, or escalation;
+- determine whether an evidence package is ready for submission preparation; and
+- identify circumstances requiring human review.
 
-The Agent must use tools to retrieve current external facts or perform external actions.
+Automated agents must rely on current operational data or persisted Case state for live facts. An agent must not represent an inference, model-generated statement, or unverified assumption as a retrieved or recorded fact.
 
-It must not invent live facts that have not been retrieved or persisted.
-
-Deterministic system controls should govern:
+Automated-agent execution must remain subject to mandatory system controls governing, as applicable:
 
 - authentication and authorization;
 - credential protection;
 - deadline enforcement;
 - approval gates;
 - execution permissions;
-- concurrency limits;
-- claim and lease behavior;
+- workload allocation and concurrency;
 - retries;
-- idempotency;
-- duplicate submission prevention;
+- idempotency and duplicate-execution prevention;
 - data-integrity validation; and
 - non-negotiable authority boundaries.
 
-The system should preserve the strengths of agent reasoning without allowing probabilistic judgment to bypass hard operational safeguards.
+An automated agent must not exceed delegated authority, bypass a required approval or human-review condition, or use model judgment to override a mandatory operational safeguard. Human review remains required where this policy, delegated authority, or applicable risk controls require it.
 
 ---
 

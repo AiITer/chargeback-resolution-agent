@@ -32,10 +32,10 @@ ORDERS = {
         created_at=datetime(2026, 10, 10, 14, 30, tzinfo=timezone.utc),
         fulfillment_status="shipped",
         shipping_carrier="shippo",
-        tracking_number="SHIPPO_DELIVERED",
-        refund_status="not_refunded",
-        refund_amount=0,
-        refunded_at=None,
+        tracking_number="SHIPPO_FAILURE",
+        refund_status="refunded",
+        refund_amount=1800,
+        refunded_at=datetime(2026, 10, 22, 18, 0, tzinfo=timezone.utc),
         replacement_order_id=None,
     )
 }

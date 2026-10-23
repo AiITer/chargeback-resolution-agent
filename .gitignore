@@ -6,3 +6,5 @@ __pycache__/
 .idea/
 .vscode/
 *.egg-info/
+spare/
+run_failure*.txt

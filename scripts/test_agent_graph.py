@@ -23,27 +23,32 @@ print("CASE ID:")
 print(case_id)
 
 
-result = graph.invoke(
+print("\nAGENT TRACE:")
+
+for state in graph.stream(
     {
         "case_id": case_id,
     },
     config={
         "recursion_limit": 20,
     },
-)
+    stream_mode="values",
+):
+    messages = state.get("messages", [])
 
+    if not messages:
+        continue
 
-print("\nFINAL MESSAGES:")
-
-for message in result["messages"]:
-    print(
-        type(message).__name__,
-        ":",
-        message.content,
-    )
+    message = messages[-1]
 
     if getattr(message, "tool_calls", None):
         print(
             "TOOL CALLS:",
             message.tool_calls,
+        )
+    elif message.content:
+        print(
+            type(message).__name__,
+            ":",
+            message.content,
         )
