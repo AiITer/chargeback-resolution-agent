@@ -43,6 +43,7 @@ def load_case_context(state: ChargebackAgentState) -> dict:
             "stripe_dispute_status": case.stripe_dispute_status,
             "network_reason_code": case.network_reason_code,
             "evidence_due_by": case.evidence_due_by,
+            "stripe_dispute_created_at": case.stripe_dispute_created_at,
         }
 
 
@@ -67,6 +68,7 @@ def investigate(state: ChargebackAgentState) -> dict:
                     f"Amount: {state['amount']} {state['currency']}\n"
                     f"Stripe dispute status: {state.get('stripe_dispute_status')}\n"
                     f"Network reason code: {state.get('network_reason_code')}\n"
+                    f"Stripe dispute created at: {state.get('stripe_dispute_created_at')}\n"
                     f"Evidence due by: {state.get('evidence_due_by')}"
                 )
             ),

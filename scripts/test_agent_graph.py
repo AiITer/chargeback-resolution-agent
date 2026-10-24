@@ -30,7 +30,7 @@ for state in graph.stream(
         "case_id": case_id,
     },
     config={
-        "recursion_limit": 20,
+        "recursion_limit": 30,
     },
     stream_mode="values",
 ):

@@ -22,6 +22,7 @@ class ChargebackAgentState(TypedDict, total=False):
     stripe_dispute_status: str | None
     network_reason_code: str | None
     evidence_due_by: datetime | None
+    stripe_dispute_created_at: datetime | None
 
     messages: Annotated[list[AnyMessage], add_messages]
 

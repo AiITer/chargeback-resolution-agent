@@ -12,6 +12,13 @@ class OrderRecord(BaseModel):
     status: str
     created_at: datetime
 
+    amount: int
+    currency: str
+
+    payment_intent_id: str | None = None
+    charge_id: str | None = None
+    dispute_id: str | None = None
+
     fulfillment_status: str
     shipping_carrier: str | None
     tracking_number: str | None
