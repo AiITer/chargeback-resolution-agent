@@ -24,3 +24,8 @@ class EvidencePackage(BaseModel):
 class SubmissionValidation(BaseModel):
     is_valid: bool
     errors: list[str] = Field(default_factory=list)
+
+class DecisionAnalysis(BaseModel):
+    material_facts: list[str]
+    relevant_policy: list[str]
+    unresolved_gaps: list[str]

@@ -8,6 +8,7 @@ from app.agent.schemas import (
     CaseAssessment,
     EvidencePackage,
     SubmissionValidation,
+    DecisionAnalysis,
 )
 
 class ChargebackAgentState(TypedDict, total=False):
@@ -32,3 +33,4 @@ class ChargebackAgentState(TypedDict, total=False):
     case_assessment: CaseAssessment
     evidence_package: EvidencePackage
     submission_validation: SubmissionValidation
+    decision_analysis: DecisionAnalysis | None

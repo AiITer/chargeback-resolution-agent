@@ -42,6 +42,28 @@ Choosing to counter a dispute does not guarantee a win. The issuer evaluates the
 
 ---
 
+## 2.1 Financial Effects of Accepting and Countering a Dispute
+
+When a formal dispute is created, Stripe reverses the disputed payment and debits the merchant's Stripe balance for the disputed amount. A dispute received fee also applies.
+
+The dispute received fee is incurred when the dispute is received. Accepting the dispute does not cancel or refund this fee.
+
+Accepting a dispute means the merchant will not submit evidence to overturn it. The dispute is closed as lost and the acceptance is irreversible. The merchant should therefore not treat acceptance as a way to avoid the financial consequences of an already-created dispute.
+
+Countering a dispute means submitting evidence for issuer review. A separate dispute countered fee may apply depending on the merchant's region and pricing. If the merchant wins, Stripe generally returns the disputed amount and the dispute countered fee, subject to regional rules.
+
+Accordingly, the financial comparison between accepting and countering should distinguish:
+
+- financial loss that has already occurred when the dispute was created;
+- fees that are unavoidable once the dispute exists;
+- additional costs associated specifically with countering;
+- the disputed amount that may be recovered if the merchant wins; and
+- the risk of duplicate merchant loss when a transaction was already refunded before the formal dispute.
+
+A dispute that follows a prior refund requires particular care. The merchant should not assume that accepting the dispute avoids financial loss merely because the customer was already refunded. The prior refund and the formal dispute are separate financial events, and refund evidence may be relevant when attempting to recover the disputed amount.
+
+---
+
 ## 3. Disputes After a Full Refund
 
 A transaction can still be disputed after the merchant has already issued a full refund.

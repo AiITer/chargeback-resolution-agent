@@ -9,6 +9,8 @@ from app.agent.schemas import (
     CaseAssessment,
     EvidencePackage,
     SubmissionValidation,
+    DecisionAnalysis,
+    InvestigationDecision
 )
 
 from app.integrations.order_service import get_order
@@ -40,9 +42,9 @@ assessment_model = get_chat_model().with_structured_output(
 evidence_model = get_chat_model().with_structured_output(
     EvidencePackage
 )
+analysis_model = get_chat_model().with_structured_output(DecisionAnalysis)
 
 MAX_INVESTIGATION_TOOL_RESULTS = 10
-conclusion_model = get_chat_model()
 
 def load_case_context(state: ChargebackAgentState) -> dict:
     case_id = state["case_id"]
@@ -110,40 +112,22 @@ def investigate(state: ChargebackAgentState) -> dict:
         }
 
     if tool_result_count >= MAX_INVESTIGATION_TOOL_RESULTS:
-        response = conclusion_model.invoke(
-            [
-                *messages,
-                HumanMessage(
-                    content=(
-                        "The investigation tool budget has been reached. "
-                        "Do not gather additional information. "
-                        "Based only on the evidence already collected, "
-                        "summarize the current investigation findings, "
-                        "including any important unresolved gaps or "
-                        "contradictions. Do not invent missing facts."
-                    )
-                ),
-            ]
-        )
-    else:
-        response = model.invoke(messages)
+        return {}
 
-    return {
-        "messages": [response]
-    }
-
-def assess_case(
-    state: ChargebackAgentState,
-) -> dict:
+def assess_case(state):
     messages = state["messages"]
+    analysis = state["decision_analysis"]
 
     assessment = assessment_model.invoke(
         [
             *messages,
             HumanMessage(
                 content=(
-                    "Based only on the investigation above, "
-                    "produce the final case assessment. "
+                    "Based on the investigation and the structured summary below, "
+                    "produce the final case assessment.\n\n"
+                    f"Material facts: {analysis.material_facts}\n"
+                    f"Relevant policy: {analysis.relevant_policy}\n"
+                    f"Unresolved gaps: {analysis.unresolved_gaps}\n\n"
                     "Do not gather new evidence. "
                     "Choose the next investigation decision."
                 )
@@ -151,9 +135,22 @@ def assess_case(
         ]
     )
 
-    return {
-        "case_assessment": assessment,
-    }
+    result = {"case_assessment": assessment}
+
+    if assessment.decision == InvestigationDecision.CONTINUE_INVESTIGATION:
+        result["messages"] = [
+            HumanMessage(
+                content=(
+                    "Continue the investigation based on the unresolved gaps "
+                    "identified in the assessment. Use the available tools to "
+                    "retrieve specific missing information that could materially "
+                    "change or strengthen the decision. Do not simply repeat the "
+                    "previous investigation or the previous conclusion."
+                )
+            )
+        ]
+
+    return result
 
 def prepare_evidence(
     state: ChargebackAgentState,
@@ -292,7 +289,7 @@ def validate_submission(
         errors.append(
             "Case assessment does not recommend contest."
         )
-        
+
     validation = SubmissionValidation(
         is_valid=len(errors) == 0,
         errors=errors,
@@ -301,3 +298,22 @@ def validate_submission(
     return {
         "submission_validation": validation,
     }
+
+def analyze_decision(state):
+    messages = state["messages"]
+
+    analysis = analysis_model.invoke(
+        [
+            *messages,
+            HumanMessage(
+                content=(
+                    "Summarize the completed investigation. "
+                    "Identify the material case facts, the relevant retrieved "
+                    "policy or guidance, and any unresolved information gaps. "
+                    "Do not make a final recommendation."
+                )
+            ),
+        ]
+    )
+
+    return {"decision_analysis": analysis}

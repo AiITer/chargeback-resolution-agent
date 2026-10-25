@@ -25,6 +25,8 @@ print(case_id)
 
 print("\nAGENT TRACE:")
 
+final_state = None
+
 for state in graph.stream(
     {
         "case_id": case_id,
@@ -34,6 +36,8 @@ for state in graph.stream(
     },
     stream_mode="values",
 ):
+    final_state = state
+            
     assessment = state.get("case_assessment")
 
     if assessment is not None:
@@ -59,6 +63,13 @@ for state in graph.stream(
             evidence.shipping_tracking_number,
         )
 
+    validation = state.get("submission_validation")
+
+    if validation is not None:
+        print("\nSUBMISSION VALIDATION:")
+        print("IS VALID:", validation.is_valid)
+        print("ERRORS:", validation.errors)
+
     messages = state.get("messages", [])
 
     if not messages:
@@ -77,3 +88,25 @@ for state in graph.stream(
             ":",
             message.content,
         )
+
+decision_analysis = final_state.get("decision_analysis")
+
+print("\nDECISION ANALYSIS:")
+
+if decision_analysis is None:
+    print("None")
+else:
+    print("\nMATERIAL FACTS:")
+    for index, fact in enumerate(decision_analysis.material_facts, start=1):
+        print(f"{index}. {fact}")
+
+    print("\nRELEVANT POLICY:")
+    for index, policy in enumerate(decision_analysis.relevant_policy, start=1):
+        print(f"{index}. {policy}")
+
+    print("\nUNRESOLVED GAPS:")
+    if decision_analysis.unresolved_gaps:
+        for index, gap in enumerate(decision_analysis.unresolved_gaps, start=1):
+            print(f"{index}. {gap}")
+    else:
+        print("None")
