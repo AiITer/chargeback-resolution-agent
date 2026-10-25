@@ -14,3 +14,13 @@ class CaseAssessment(BaseModel):
     decision: InvestigationDecision
     confidence: float = Field(ge=0.0, le=1.0)
     reasoning_summary: str
+
+class EvidencePackage(BaseModel):
+    uncategorized_text: str
+
+    shipping_carrier: str | None = None
+    shipping_tracking_number: str | None = None
+
+class SubmissionValidation(BaseModel):
+    is_valid: bool
+    errors: list[str] = Field(default_factory=list)

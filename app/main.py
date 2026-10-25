@@ -21,6 +21,10 @@ from app.schemas.case import (
 )
 
 from app.integrations.stripe import construct_stripe_event
+from app.integrations.order_service import (
+    find_order_by_stripe_reference,
+    update_order_stripe_references,
+)
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -151,6 +155,14 @@ async def stripe_webhook(
     if event["type"] == "charge.dispute.created":
         dispute = event["data"]["object"].to_dict()
 
+        payment_intent_id = dispute.get("payment_intent")
+        charge_id = dispute.get("charge")
+
+        order = find_order_by_stripe_reference(
+            payment_intent_id=payment_intent_id,
+            charge_id=charge_id,
+        )
+
         case = get_case_by_stripe_dispute_id(
             session,
             dispute["id"],
@@ -173,9 +185,10 @@ async def stripe_webhook(
             stripe_created = dispute.get("created")
             case = ChargebackCaseModel(
                 case_id=str(uuid4()),
+                order_id=order.order_id,
                 stripe_dispute_id=dispute["id"],
-                stripe_charge_id=dispute.get("charge"),
-                stripe_payment_intent_id=dispute.get("payment_intent"),
+                stripe_charge_id=charge_id,
+                stripe_payment_intent_id=payment_intent_id,
                 dispute_reason=dispute["reason"],
                 amount=dispute["amount"],
                 currency=dispute["currency"],
@@ -202,6 +215,11 @@ async def stripe_webhook(
             add_case(session, case)
             session.commit()
             session.refresh(case)
+            
+            update_order_stripe_references(
+                order.order_id,
+                dispute_id=dispute["id"],
+            )
 
             logger.info(
                 "Created chargeback case %s from Stripe dispute %s",

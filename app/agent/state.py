@@ -4,8 +4,11 @@ from typing import Annotated, TypedDict
 from langchain_core.messages import AnyMessage
 from langgraph.graph.message import add_messages
 
-from app.agent.schemas import CaseAssessment
-
+from app.agent.schemas import (
+    CaseAssessment,
+    EvidencePackage,
+    SubmissionValidation,
+)
 
 class ChargebackAgentState(TypedDict, total=False):
     case_id: str
@@ -27,3 +30,5 @@ class ChargebackAgentState(TypedDict, total=False):
     messages: Annotated[list[AnyMessage], add_messages]
 
     case_assessment: CaseAssessment
+    evidence_package: EvidencePackage
+    submission_validation: SubmissionValidation

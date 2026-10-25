@@ -7,4 +7,4 @@ __pycache__/
 .vscode/
 *.egg-info/
 spare/
-run_failure*.txt
+run_*.txt

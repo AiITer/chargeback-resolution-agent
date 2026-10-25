@@ -34,6 +34,31 @@ for state in graph.stream(
     },
     stream_mode="values",
 ):
+    assessment = state.get("case_assessment")
+
+    if assessment is not None:
+        print("\nCASE ASSESSMENT:")
+        print("DECISION:", assessment.decision)
+        print("CONFIDENCE:", assessment.confidence)
+        print("REASONING:", assessment.reasoning_summary)
+
+    evidence = state.get("evidence_package")
+
+    if evidence is not None:
+        print("\nEVIDENCE PACKAGE:")
+        print(
+            "UNCATEGORIZED TEXT:",
+            evidence.uncategorized_text,
+        )
+        print(
+            "SHIPPING CARRIER:",
+            evidence.shipping_carrier,
+        )
+        print(
+            "TRACKING NUMBER:",
+            evidence.shipping_tracking_number,
+        )
+
     messages = state.get("messages", [])
 
     if not messages:

@@ -13,7 +13,7 @@ def main() -> None:
 
     tracking = client.tracking_status.get(
         carrier="shippo",
-        tracking_number="SHIPPO_DELIVERED",
+        tracking_number="SHIPPO_RETURNED",
     )
 
     print("CARRIER:", tracking.carrier)
