@@ -18,13 +18,9 @@ def main():
         "--refund",
         action="store_true",
     )
-    parser.add_argument(
-        "--human-review",
-        action="store_true",
-    )
+
     args = parser.parse_args()
 
-    story_now = datetime.now(timezone.utc)
     story_now = datetime.now(timezone.utc)
 
     order_created_at = story_now - timedelta(days=7)
@@ -75,11 +71,7 @@ def main():
 
         update_order_fulfillment(
             order.order_id,
-            fulfillment_status=(
-                "delivered"
-                if args.human_review
-                else "shipped"
-            ),
+            fulfillment_status="shipped",
             shipping_carrier="shippo",
             tracking_number="SHIPPO_FAILURE",
         )
