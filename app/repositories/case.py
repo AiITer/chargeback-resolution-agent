@@ -45,3 +45,19 @@ def update_case_status(
     case.status = status
     session.add(case)
     return case
+
+def update_case_assessment(
+    session: Session,
+    case: ChargebackCaseModel,
+    *,
+    decision: str,
+    confidence: float,
+    reasoning: str,
+) -> ChargebackCaseModel:
+    case.agent_decision = decision
+    case.agent_confidence = confidence
+    case.agent_reasoning = reasoning
+
+    session.add(case)
+
+    return case

@@ -30,6 +30,7 @@ final_state = None
 for state in graph.stream(
     {
         "case_id": case_id,
+        "stripe_test_outcome": "won",
     },
     config={
         "recursion_limit": 30,
@@ -63,10 +64,10 @@ for state in graph.stream(
             evidence.shipping_tracking_number,
         )
 
-    validation = state.get("submission_validation")
+    validation = state.get("stage_validation")
 
     if validation is not None:
-        print("\nSUBMISSION VALIDATION:")
+        print("\nSTAGE VALIDATION:")
         print("IS VALID:", validation.is_valid)
         print("ERRORS:", validation.errors)
 

@@ -31,3 +31,39 @@ def construct_stripe_event(
 def get_stripe_dispute(dispute_id: str):
     client = get_stripe_client()
     return client.v1.disputes.retrieve(dispute_id)
+
+def close_stripe_dispute(dispute_id: str):
+    client = get_stripe_client()
+
+    return client.v1.disputes.close(
+        dispute_id
+    )
+
+def submit_stripe_dispute_evidence(
+    dispute_id: str,
+    *,
+    uncategorized_text: str,
+    shipping_carrier: str | None = None,
+    shipping_tracking_number: str | None = None,
+):
+    client = get_stripe_client()
+
+    evidence: dict[str, str] = {
+        "uncategorized_text": uncategorized_text,
+    }
+
+    if shipping_carrier is not None:
+        evidence["shipping_carrier"] = shipping_carrier
+
+    if shipping_tracking_number is not None:
+        evidence["shipping_tracking_number"] = (
+            shipping_tracking_number
+        )
+
+    return client.v1.disputes.update(
+        dispute_id,
+        {
+            "evidence": evidence,
+            "submit": True,
+        },
+    )

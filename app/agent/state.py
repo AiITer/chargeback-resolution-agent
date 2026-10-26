@@ -7,7 +7,7 @@ from langgraph.graph.message import add_messages
 from app.agent.schemas import (
     CaseAssessment,
     EvidencePackage,
-    SubmissionValidation,
+    StageValidation,
     DecisionAnalysis,
 )
 
@@ -18,6 +18,8 @@ class ChargebackAgentState(TypedDict, total=False):
     stripe_dispute_id: str
     stripe_charge_id: str | None
     stripe_payment_intent_id: str | None
+
+    stripe_test_outcome: str | None
 
     dispute_reason: str
     amount: int
@@ -32,5 +34,5 @@ class ChargebackAgentState(TypedDict, total=False):
 
     case_assessment: CaseAssessment
     evidence_package: EvidencePackage
-    submission_validation: SubmissionValidation
+    stage_validation: StageValidation
     decision_analysis: DecisionAnalysis | None

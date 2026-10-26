@@ -10,7 +10,10 @@ from app.agent.nodes import (
     investigate,
     load_case_context,
     prepare_evidence,
-    validate_submission,
+    validate_contest,
+    validate_accept,
+    accept_dispute,
+    submit_contest,
 )
 from langchain_core.messages import ToolMessage
 from app.agent.schemas import InvestigationDecision
@@ -49,11 +52,51 @@ def route_after_investigation(
 
 def route_after_assessment(
     state: ChargebackAgentState,
-) -> Literal["investigate", "__end__"]:
+) -> Literal[
+    "investigate",
+    "prepare_evidence",
+    "validate_accept",
+    "__end__",
+]:
     assessment = state["case_assessment"]
 
-    if assessment.decision == InvestigationDecision.CONTINUE_INVESTIGATION:
+    if (
+        assessment.decision
+        == InvestigationDecision.CONTINUE_INVESTIGATION
+    ):
         return "investigate"
+
+    if (
+        assessment.decision
+        == InvestigationDecision.RECOMMEND_CONTEST
+    ):
+        return "prepare_evidence"
+
+    if (
+        assessment.decision
+        == InvestigationDecision.RECOMMEND_ACCEPT
+    ):
+        return "validate_accept"
+
+    return "__end__"
+
+def route_after_accept_validation(
+    state: ChargebackAgentState,
+) -> Literal["accept_dispute", "__end__"]:
+    validation = state["stage_validation"]
+
+    if validation.is_valid:
+        return "accept_dispute"
+
+    return "__end__"
+
+def route_after_contest_validation(
+    state: ChargebackAgentState,
+) -> Literal["submit_contest", "__end__"]:
+    validation = state["stage_validation"]
+
+    if validation.is_valid:
+        return "submit_contest"
 
     return "__end__"
 
@@ -86,8 +129,23 @@ builder.add_node(
 )
 
 builder.add_node(
-    "validate_submission",
-    validate_submission,
+    "validate_contest",
+    validate_contest,
+)
+
+builder.add_node(
+    "validate_accept",
+    validate_accept,
+)
+
+builder.add_node(
+    "accept_dispute",
+    accept_dispute,
+)
+
+builder.add_node(
+    "submit_contest",
+    submit_contest,
 )
 
 builder.add_node("analyze_decision", analyze_decision)
@@ -121,11 +179,26 @@ builder.add_conditional_edges(
 
 builder.add_edge(
     "prepare_evidence",
-    "validate_submission",
+    "validate_contest",
+)
+
+builder.add_conditional_edges(
+    "validate_contest",
+    route_after_contest_validation,
 )
 
 builder.add_edge(
-    "validate_submission",
+    "submit_contest",
+    END,
+)
+
+builder.add_conditional_edges(
+    "validate_accept",
+    route_after_accept_validation,
+)
+
+builder.add_edge(
+    "accept_dispute",
     END,
 )
 

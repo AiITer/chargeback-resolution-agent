@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, Enum, Integer, String
+from sqlalchemy import DateTime, Enum, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -90,3 +90,18 @@ class ChargebackCaseModel(Base):
         DateTime(timezone=True),
         nullable=True,
     )
+
+    agent_decision: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+
+    agent_confidence: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+
+    agent_reasoning: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+        )

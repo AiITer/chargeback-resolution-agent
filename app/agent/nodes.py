@@ -8,13 +8,17 @@ from app.agent.prompts import CHARGEBACK_AGENT_SYSTEM_PROMPT
 from app.agent.schemas import (
     CaseAssessment,
     EvidencePackage,
-    SubmissionValidation,
+    StageValidation,
     DecisionAnalysis,
     InvestigationDecision
 )
 
 from app.integrations.order_service import get_order
-from app.integrations.stripe import get_stripe_dispute
+from app.integrations.stripe import (
+    get_stripe_dispute,
+    close_stripe_dispute,
+    submit_stripe_dispute_evidence,
+)
 
 from app.agent.state import ChargebackAgentState
 from app.agent.tools import (
@@ -24,8 +28,13 @@ from app.agent.tools import (
 )
 from app.database import SessionLocal
 from app.integrations.llm import get_chat_model
-from app.repositories.case import get_case_by_id
+from app.repositories.case import (
+    get_case_by_id,
+    update_case_assessment,
+    update_case_status,
+)
 
+from app.schemas.case import CaseStatus
 from datetime import datetime, timezone
 
 
@@ -36,6 +45,10 @@ TOOLS = [
 ]
 
 model = get_chat_model().bind_tools(TOOLS)
+forced_tool_model = get_chat_model().bind_tools(
+    TOOLS,
+    tool_choice="required",
+)
 assessment_model = get_chat_model().with_structured_output(
     CaseAssessment
 )
@@ -114,6 +127,17 @@ def investigate(state: ChargebackAgentState) -> dict:
     if tool_result_count >= MAX_INVESTIGATION_TOOL_RESULTS:
         return {}
 
+    last_message = messages[-1]
+
+    if isinstance(last_message, HumanMessage):
+        response = forced_tool_model.invoke(messages)
+    else:
+        response = model.invoke(messages)
+
+    return {
+        "messages": [response]
+    }
+
 def assess_case(state):
     messages = state["messages"]
     analysis = state["decision_analysis"]
@@ -136,16 +160,65 @@ def assess_case(state):
     )
 
     result = {"case_assessment": assessment}
+    if (
+        assessment.decision
+        != InvestigationDecision.CONTINUE_INVESTIGATION
+    ):
+        with SessionLocal() as session:
+            case = get_case_by_id(
+                session,
+                state["case_id"],
+            )
+
+            if case is None:
+                raise ValueError(
+                    f"Case not found: {state['case_id']}"
+                )
+
+            update_case_assessment(
+                session,
+                case,
+                decision=assessment.decision.value,
+                confidence=assessment.confidence,
+                reasoning=assessment.reasoning_summary,
+            )
+
+            if (
+                assessment.decision
+                == InvestigationDecision.RECOMMEND_CONTEST
+            ):
+                update_case_status(
+                    session,
+                    case,
+                    CaseStatus.GATHERING_EVIDENCE,
+                )
+
+            elif (
+                assessment.decision
+                == InvestigationDecision.NEEDS_HUMAN_REVIEW
+            ):
+                update_case_status(
+                    session,
+                    case,
+                    CaseStatus.WAITING_FOR_HUMAN,
+    )
+
+            session.commit()
 
     if assessment.decision == InvestigationDecision.CONTINUE_INVESTIGATION:
         result["messages"] = [
             HumanMessage(
                 content=(
-                    "Continue the investigation based on the unresolved gaps "
-                    "identified in the assessment. Use the available tools to "
-                    "retrieve specific missing information that could materially "
-                    "change or strengthen the decision. Do not simply repeat the "
-                    "previous investigation or the previous conclusion."
+                    "The previous assessment determined that the investigation "
+                    "should continue.\n\n"
+                    f"Previous assessment reasoning: "
+                    f"{assessment.reasoning_summary}\n\n"
+                    f"Unresolved information gaps: "
+                    f"{analysis.unresolved_gaps}\n\n"
+                    "Use the available tools to investigate one or more of these "
+                    "unresolved gaps. Retrieve new case-specific information that "
+                    "could materially change the decision or strengthen the "
+                    "evidence package."
                 )
             )
         ]
@@ -188,7 +261,7 @@ def prepare_evidence(
         "evidence_package": evidence,
     }
 
-def validate_submission(
+def validate_contest(
     state: ChargebackAgentState,
 ) -> dict:
     errors: list[str] = []
@@ -290,13 +363,13 @@ def validate_submission(
             "Case assessment does not recommend contest."
         )
 
-    validation = SubmissionValidation(
+    validation = StageValidation(
         is_valid=len(errors) == 0,
         errors=errors,
     )
 
     return {
-        "submission_validation": validation,
+        "stage_validation": validation,
     }
 
 def analyze_decision(state):
@@ -317,3 +390,134 @@ def analyze_decision(state):
     )
 
     return {"decision_analysis": analysis}
+
+def validate_accept(
+    state: ChargebackAgentState,
+) -> dict:
+    errors: list[str] = []
+
+    assessment = state["case_assessment"]
+
+    if (
+        assessment.decision
+        != InvestigationDecision.RECOMMEND_ACCEPT
+    ):
+        errors.append(
+            "Case assessment does not recommend accept."
+        )
+
+    dispute = get_stripe_dispute(
+        state["stripe_dispute_id"]
+    ).to_dict()
+
+    if dispute.get("id") != state["stripe_dispute_id"]:
+        errors.append(
+            "Stripe dispute ID does not match the Case."
+        )
+
+    if dispute.get("charge") != state.get(
+        "stripe_charge_id"
+    ):
+        errors.append(
+            "Stripe dispute Charge does not match the Case."
+        )
+
+    if dispute.get("payment_intent") != state.get(
+        "stripe_payment_intent_id"
+    ):
+        errors.append(
+            "Stripe dispute PaymentIntent does not match "
+            "the Case."
+        )
+
+    if dispute.get("status") != "needs_response":
+        errors.append(
+            "Stripe dispute is not in needs_response status."
+        )
+
+    validation = StageValidation(
+        is_valid=len(errors) == 0,
+        errors=errors,
+    )
+
+    return {
+        "stage_validation": validation,
+    }
+
+def accept_dispute(
+    state: ChargebackAgentState,
+) -> dict:
+    validation = state["stage_validation"]
+
+    if not validation.is_valid:
+        raise ValueError(
+            "Cannot accept dispute because stage validation failed."
+        )
+
+    dispute = close_stripe_dispute(
+        state["stripe_dispute_id"]
+    )
+
+    with SessionLocal() as session:
+        case = get_case_by_id(
+            session,
+            state["case_id"],
+        )
+
+        if case is None:
+            raise ValueError(
+                f"Case not found: {state['case_id']}"
+            )
+
+        update_case_status(
+            session,
+            case,
+            CaseStatus.LOST,
+        )
+
+        session.commit()
+
+    return {}
+
+def submit_contest(
+    state: ChargebackAgentState,
+) -> dict:
+        evidence = state["evidence_package"]
+
+        test_outcome = state.get("stripe_test_outcome")
+
+        uncategorized_text = evidence.uncategorized_text
+
+        if test_outcome == "won":
+            uncategorized_text = "winning_evidence"
+
+        elif test_outcome == "lost":
+            uncategorized_text = "losing_evidence"
+
+        submit_stripe_dispute_evidence(
+            state["stripe_dispute_id"],
+            uncategorized_text=uncategorized_text,
+            shipping_carrier=evidence.shipping_carrier,
+            shipping_tracking_number=evidence.shipping_tracking_number,
+        )
+
+    with SessionLocal() as session:
+        case = get_case_by_id(
+            session,
+            state["case_id"],
+        )
+
+        if case is None:
+            raise ValueError(
+                f"Case not found: {state['case_id']}"
+            )
+
+        update_case_status(
+            session,
+            case,
+            CaseStatus.WAITING_FOR_STRIPE,
+        )
+
+        session.commit()
+
+    return {}

@@ -16,6 +16,7 @@ from app.repositories.case import (
 from app.models.case import ChargebackCaseModel
 from app.schemas.case import (
     ChargebackCase,
+    CaseStatus,
     # ChargebackCaseCreate,
     # CaseStatusUpdate,
 )
@@ -227,4 +228,45 @@ async def stripe_webhook(
                 dispute["id"],
             )
             
+    elif event["type"] == "charge.dispute.closed":
+        dispute = event["data"]["object"].to_dict()
+
+        case = get_case_by_stripe_dispute_id(
+            session,
+            dispute["id"],
+        )
+
+        if case is None:
+            logger.warning(
+                "No Case found for closed Stripe dispute %s",
+                dispute["id"],
+            )
+
+            return {"received": True}
+
+        stripe_status = dispute.get("status")
+
+        case.stripe_dispute_status = stripe_status
+
+        if stripe_status == "won":
+            update_case_status(
+                session,
+                case,
+                CaseStatus.WON,
+            )
+
+        elif stripe_status == "lost":
+            update_case_status(
+                session,
+                case,
+                CaseStatus.LOST,
+            )
+
+        session.commit()
+
+        logger.info(
+            "Closed chargeback case %s with Stripe status %s",
+            case.case_id,
+            stripe_status,
+        )
     return {"received": True}

@@ -21,7 +21,7 @@ class EvidencePackage(BaseModel):
     shipping_carrier: str | None = None
     shipping_tracking_number: str | None = None
 
-class SubmissionValidation(BaseModel):
+class StageValidation(BaseModel):
     is_valid: bool
     errors: list[str] = Field(default_factory=list)
 
