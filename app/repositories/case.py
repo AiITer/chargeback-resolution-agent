@@ -1,8 +1,28 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from app.models.case import ChargebackCaseModel
 from app.schemas.case import CaseStatus
+
+def transition_case_status(
+    session: Session,
+    case_id: str,
+    *,
+    from_status: CaseStatus,
+    to_status: CaseStatus,
+) -> bool:
+    statement = (
+        update(ChargebackCaseModel)
+        .where(
+            ChargebackCaseModel.case_id == case_id,
+            ChargebackCaseModel.status == from_status,
+        )
+        .values(status=to_status)
+    )
+
+    result = session.execute(statement)
+
+    return result.rowcount == 1
 
 
 def add_case(

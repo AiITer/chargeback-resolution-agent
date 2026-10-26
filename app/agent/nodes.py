@@ -32,6 +32,7 @@ from app.repositories.case import (
     get_case_by_id,
     update_case_assessment,
     update_case_status,
+    transition_case_status,
 )
 
 from app.schemas.case import CaseStatus
@@ -482,40 +483,38 @@ def accept_dispute(
 def submit_contest(
     state: ChargebackAgentState,
 ) -> dict:
-        evidence = state["evidence_package"]
+    validation = state["stage_validation"]
 
-        test_outcome = state.get("stripe_test_outcome")
-
-        uncategorized_text = evidence.uncategorized_text
-
-        if test_outcome == "won":
-            uncategorized_text = "winning_evidence"
-
-        elif test_outcome == "lost":
-            uncategorized_text = "losing_evidence"
-
-        submit_stripe_dispute_evidence(
-            state["stripe_dispute_id"],
-            uncategorized_text=uncategorized_text,
-            shipping_carrier=evidence.shipping_carrier,
-            shipping_tracking_number=evidence.shipping_tracking_number,
+    if not validation.is_valid:
+        raise ValueError(
+            "Cannot contest dispute because stage validation failed."
         )
+
+    evidence = state["evidence_package"]
+
+    test_outcome = state.get("stripe_test_outcome")
+
+    uncategorized_text = evidence.uncategorized_text
+
+    if test_outcome == "won":
+        uncategorized_text = "winning_evidence"
+
+    elif test_outcome == "lost":
+        uncategorized_text = "losing_evidence"
+
+    submit_stripe_dispute_evidence(
+        state["stripe_dispute_id"],
+        uncategorized_text=uncategorized_text,
+        shipping_carrier=evidence.shipping_carrier,
+        shipping_tracking_number=evidence.shipping_tracking_number,
+    )
 
     with SessionLocal() as session:
-        case = get_case_by_id(
+        transition_case_status(
             session,
             state["case_id"],
-        )
-
-        if case is None:
-            raise ValueError(
-                f"Case not found: {state['case_id']}"
-            )
-
-        update_case_status(
-            session,
-            case,
-            CaseStatus.WAITING_FOR_STRIPE,
+            from_status=CaseStatus.GATHERING_EVIDENCE,
+            to_status=CaseStatus.WAITING_FOR_STRIPE,
         )
 
         session.commit()

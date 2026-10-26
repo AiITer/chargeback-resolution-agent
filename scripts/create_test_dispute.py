@@ -9,11 +9,25 @@ from app.integrations.order_service import (
 )
 from app.integrations.stripe import get_stripe_client
 
+import argparse
+
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--refund",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--human-review",
+        action="store_true",
+    )
+    args = parser.parse_args()
+
+    story_now = datetime.now(timezone.utc)
     story_now = datetime.now(timezone.utc)
 
-    order_created_at = story_now - timedelta(days=4)
+    order_created_at = story_now - timedelta(days=7)
     refunded_at = story_now - timedelta(hours=1)
     client = get_stripe_client()
 
@@ -61,11 +75,16 @@ def main():
 
         update_order_fulfillment(
             order.order_id,
-            fulfillment_status="shipped",
+            fulfillment_status=(
+                "delivered"
+                if args.human_review
+                else "shipped"
+            ),
             shipping_carrier="shippo",
             tracking_number="SHIPPO_FAILURE",
         )
 
+    if args.refund:
         update_order_refund(
             order.order_id,
             refund_status="refunded",
